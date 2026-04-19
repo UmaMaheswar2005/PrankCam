@@ -1,9 +1,12 @@
 # PrankCam .gitignore
 
-# Python
+# Python / Backend
 backend/.venv/
 backend/__pycache__/
 backend/*.pyc
+backend/*.spec
+backend/build/            # PyInstaller build artifacts
+backend/dist/             # PyInstaller output
 backend/weights/          # model weights can be hundreds of MB — never commit
 *.egg-info/
 .pytest_cache/
@@ -16,6 +19,11 @@ out/
 
 # Rust / Tauri
 src-tauri/target/
+src-tauri/gen/            # Auto-generated schemas by Tauri v2
+src-tauri/binaries/prankcam-backend* # Do NOT commit compiled 30MB+ sidecar binaries!
+
+# Installer drivers (If you download them locally, they are huge)
+backend/drivers/
 
 # OS
 .DS_Store
@@ -23,9 +31,8 @@ Thumbs.db
 *.swp
 
 # IDE
-.vscode/settings.json
+.vscode/
 .idea/
 
+# PyInstaller temp
 _internal/
-# PrankCam runtime data (generated per-user)
-# ~/.prankcam/ lives outside the repo — nothing to ignore here
