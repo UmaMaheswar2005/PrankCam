@@ -26,5 +26,6 @@ Thumbs.db
 .vscode/settings.json
 .idea/
 
+_internal/
 # PrankCam runtime data (generated per-user)
 # ~/.prankcam/ lives outside the repo — nothing to ignore here
