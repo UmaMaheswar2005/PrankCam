@@ -1,25 +1,11 @@
 {
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
-  "description": "PrankCam main window permissions",
   "windows": ["main"],
   "permissions": [
-    "core:default",
-
-    "shell:allow-spawn",
-    "shell:allow-kill",
-    "shell:allow-stdin-write",
-
-    "dialog:allow-open",
-    "dialog:allow-save",
-
-    "process:allow-exit",
-    "process:allow-restart",
-
-    "http:default",
-    "http:allow-fetch",
-
-    "log:allow-log",
-    "log:allow-print-filter"
+    "core:default", "http:default", "shell:allow-kill", "shell:allow-stdin-write",
+    "dialog:allow-open", "dialog:allow-save", "process:allow-exit", "process:allow-restart", "log:default",
+    { "identifier": "http:allow-fetch", "allow": [{ "url": "http://127.0.0.1:8765/*" }] },
+    { "identifier": "shell:allow-spawn", "allow": [{ "name": "binaries/prankcam-backend", "sidecar": true }] }
   ]
 }

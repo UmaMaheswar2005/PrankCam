@@ -36,9 +36,7 @@
     "targets": "all",
 
     "icon": [
-      "icons/32x32.png",
-      "icons/128x128.png",
-      "icons/128x128@2x.png",
+      "icons/icon.png",
       "icons/icon.icns",
       "icons/icon.ico"
     ],
@@ -51,9 +49,7 @@
       "binaries/prankcam-backend"
     ],
 
-    "resources": [
-      "drivers/**",
-      "resources/**"
+    "resources": ["resources"
     ],
 
     "macOS": {
@@ -70,9 +66,7 @@
         "installMode": "perMachine",
         "installerIcon": "icons/icon.ico",
         "headerImage":   "icons/128x128.png",
-        "sidebarImage":  "icons/128x128@2x.png",
-        "license":       "../../LICENSE.txt",
-        "installerHooks": "nsis/installer-hook.nsi"
+        "sidebarImage":  "icons/128x128@2x.png"
       },
       "certificateThumbprint": null,
       "digestAlgorithm":       "sha256",

@@ -28,7 +28,7 @@ PyAudio==0.2.14
 # Linux  → v4l2loopback (kernel module, installed by first-run wizard)
 # Windows → OBS Virtual Camera (installed by first-run wizard)
 # macOS  → CoreMediaIO / OBS Virtual Camera (installed by first-run wizard)
-pyvirtualcam==0.11.0
+pyvirtualcam>=0.11.1
 
 # ── Numerics / utilities ───────────────────────────────────────────────────────
 numpy==1.26.4                 # 1.x required by insightface & onnxruntime 1.20

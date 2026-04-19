@@ -1073,7 +1073,7 @@ function LogPanel({
   logs, logRef, colour, onClear,
 }: {
   logs: LogEntry[];
-  logRef: React.RefObject<HTMLDivElement>;
+  logRef: React.RefObject<HTMLDivElement | null>;
   colour: Record<LogEntry["level"], string>;
   onClear: () => void;
 }) {

@@ -364,8 +364,6 @@ async fn install_drivers_linux() -> Result<(), String> {
 // We copy those next to the sidecar exe on first run so the OS loader finds them.
 
 fn unpack_backend_libs(app: &AppHandle) -> Result<(), String> {
-    use std::fs;
-
     let triple = get_target_triple();
     let res_dir = app.path().resource_dir().map_err(|e| e.to_string())?;
     let libs_src = res_dir.join("backend-libs").join(&triple);
