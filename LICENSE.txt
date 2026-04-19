@@ -1,0 +1,64 @@
+PrankCam Software License
+==========================
+
+Copyright (c) 2024-2026 PrankCam Contributors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+─────────────────────────────────────────────────────────────────────────────
+Third-Party Software
+─────────────────────────────────────────────────────────────────────────────
+
+This software includes and/or installs third-party components:
+
+InsightFace (Apache License 2.0)
+  https://github.com/deepinsight/insightface
+
+ONNX Runtime (MIT License)
+  https://github.com/microsoft/onnxruntime
+
+OpenCV (Apache License 2.0)
+  https://github.com/opencv/opencv
+
+FastAPI (MIT License)
+  https://github.com/tiangolo/fastapi
+
+pyvirtualcam (GPL v2)
+  https://github.com/letmaik/pyvirtualcam
+
+sounddevice (MIT License)
+  https://github.com/spatialaudio/python-sounddevice
+
+BlackHole Virtual Audio Driver (GPL v3) — macOS only, installed separately
+  https://github.com/ExistentialAudio/BlackHole
+
+VB-Audio Virtual Cable (Donationware) — Windows only, installed separately
+  https://vb-audio.com/Cable/
+
+OBS Studio Virtual Camera (GPL v2) — Windows/macOS, installed separately
+  https://obsproject.com/
+
+─────────────────────────────────────────────────────────────────────────────
+IMPORTANT NOTICE
+─────────────────────────────────────────────────────────────────────────────
+
+This software provides tools for real-time video and audio processing.
+Users are solely responsible for how they use these capabilities.
+Use of this software to deceive others without their consent may be illegal
+in your jurisdiction. Please use responsibly and ethically.

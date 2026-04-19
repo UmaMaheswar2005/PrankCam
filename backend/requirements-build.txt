@@ -1,0 +1,7 @@
+# PrankCam — Build-time only (developer machine, not shipped to users)
+# Install AFTER requirements.txt:
+#   pip install -r requirements.txt
+#   pip install -r requirements-build.txt
+
+pyinstaller==6.11.1
+pyinstaller-hooks-contrib==2024.10

@@ -1,0 +1,92 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+
+  "productName": "PrankCam",
+  "version":     "3.0.0",
+  "identifier":  "io.prankcam.app",
+
+  "build": {
+    "beforeDevCommand":   "npm run dev",
+    "beforeBuildCommand": "npm run build",
+    "devUrl":             "http://localhost:3000",
+    "frontendDist":       "../out"
+  },
+
+  "app": {
+    "windows": [
+      {
+        "label":      "main",
+        "title":      "PrankCam",
+        "width":      760,
+        "height":     820,
+        "minWidth":   680,
+        "minHeight":  700,
+        "resizable":  true,
+        "center":     true,
+        "decorations": true
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self' ipc: http://ipc.localhost; connect-src http://127.0.0.1:8765; img-src 'self' data: http://127.0.0.1:8765; style-src 'unsafe-inline'"
+    }
+  },
+
+  "bundle": {
+    "active": true,
+    "targets": "all",
+
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+
+    "category":         "Utility",
+    "shortDescription": "Real-time face swap and voice conversion",
+    "longDescription":  "PrankCam routes a processed webcam and microphone feed to a virtual camera and virtual microphone for use in Zoom, Discord, Meet, and more.",
+
+    "externalBin": [
+      "binaries/prankcam-backend"
+    ],
+
+    "resources": [
+      "drivers/**",
+      "resources/**"
+    ],
+
+    "macOS": {
+      "minimumSystemVersion": "12.0",
+      "signingIdentity": null,
+      "entitlements": "entitlements.plist"
+    },
+
+    "windows": {
+      "wix": {
+        "language": "en-US"
+      },
+      "nsis": {
+        "installMode": "perMachine",
+        "installerIcon": "icons/icon.ico",
+        "headerImage":   "icons/128x128.png",
+        "sidebarImage":  "icons/128x128@2x.png",
+        "license":       "../../LICENSE.txt",
+        "installerHooks": "nsis/installer-hook.nsi"
+      },
+      "certificateThumbprint": null,
+      "digestAlgorithm":       "sha256",
+      "timestampUrl":          ""
+    },
+
+    "linux": {
+      "deb": {
+        "depends": ["libwebkit2gtk-4.1-0", "libssl3", "libayatana-appindicator3-1"],
+        "files": {}
+      },
+      "appimage": {
+        "bundleMediaFramework": true
+      }
+    }
+  }
+}

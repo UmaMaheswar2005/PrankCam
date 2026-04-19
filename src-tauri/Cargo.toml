@@ -1,0 +1,45 @@
+[package]
+name    = "prankcam"
+version = "3.0.0"
+edition = "2021"
+
+# ── Build dependencies ────────────────────────────────────────────────────────
+[build-dependencies]
+tauri-build = { version = "2.0.3", features = [] }
+
+# ── Runtime dependencies ──────────────────────────────────────────────────────
+[dependencies]
+# Core Tauri 2 — no legacy "custom-protocol" feature needed (it is default in v2)
+tauri = { version = "2.2.0", features = [] }
+
+# Tauri 2 plugins — each is now a separate crate (NOT bundled in tauri core)
+tauri-plugin-shell   = "2.2.0"   # sidecar spawn + kill
+tauri-plugin-dialog  = "2.2.0"   # native file open/save dialogs
+tauri-plugin-log     = "2.2.0"   # structured logging to console + file
+tauri-plugin-process = "2.2.0"   # app exit / restart
+tauri-plugin-http    = "2.2.0"   # allowlisted HTTP from Rust side
+
+serde      = { version = "1.0.217", features = ["derive"] }
+serde_json = "1.0.134"
+tokio      = { version = "1.43.0",  features = ["full"] }
+log        = "0.4.22"
+
+# HTTP client for health-check pings from Rust
+ureq = { version = "2.12.1", features = [] }
+
+# UNIX signal support (SIGTERM for graceful backend shutdown)
+[target.'cfg(unix)'.dependencies]
+libc = "0.2.169"
+
+# ── Feature flags ─────────────────────────────────────────────────────────────
+# NOTE: In Tauri 2, "custom-protocol" is the default and NOT declared here.
+[features]
+default = []
+
+# ── Release profile ───────────────────────────────────────────────────────────
+[profile.release]
+panic         = "abort"
+codegen-units = 1
+lto           = "thin"    # "thin" is faster than true; use true only for final release
+opt-level     = "s"       # optimise for size (important for final installer)
+strip         = true

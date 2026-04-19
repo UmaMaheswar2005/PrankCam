@@ -1,0 +1,40 @@
+# PrankCam — Runtime Python dependencies
+# All versions pinned and cross-validated for April 2026.
+# IMPORTANT: torch is NOT here. All inference uses onnxruntime (50x smaller binary).
+#
+# Install: pip install -r requirements.txt
+# Build:   pip install -r requirements-build.txt && pyinstaller prankcam-backend.spec
+
+# ── Web framework ──────────────────────────────────────────────────────────────
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+python-multipart==0.0.20
+aiofiles==24.1.0
+
+# ── Computer vision (headless = no Qt/GTK GUI dep — critical for PyInstaller) ──
+opencv-python-headless==4.10.0.84
+
+# ── Inference runtime (replaces 2 GB torch for production) ─────────────────────
+onnxruntime==1.20.1          # CPU; swap to onnxruntime-gpu==1.20.1 for CUDA
+
+# ── Face analysis (detector + embeddings, wraps onnxruntime internally) ─────────
+insightface==0.7.3
+
+# ── Audio ─────────────────────────────────────────────────────────────────────
+sounddevice==0.4.7
+PyAudio==0.2.14
+
+# ── Virtual camera output ──────────────────────────────────────────────────────
+# Linux  → v4l2loopback (kernel module, installed by first-run wizard)
+# Windows → OBS Virtual Camera (installed by first-run wizard)
+# macOS  → CoreMediaIO / OBS Virtual Camera (installed by first-run wizard)
+pyvirtualcam==0.11.0
+
+# ── Numerics / utilities ───────────────────────────────────────────────────────
+numpy==1.26.4                 # 1.x required by insightface & onnxruntime 1.20
+pydantic==2.10.4
+httpx==0.28.1                 # async HTTP for model downloads inside backend
+tqdm==4.67.1                  # download progress bars
+
+# ── Scipy (used by RVC pitch-shift in audio_pipeline mock) ────────────────────
+scipy==1.14.1

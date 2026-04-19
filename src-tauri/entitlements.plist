@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+    "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!-- Microphone access (voice changer) -->
+    <key>com.apple.security.device.audio-input</key>
+    <true/>
+    <!-- Camera access (face swap preview) -->
+    <key>com.apple.security.device.camera</key>
+    <true/>
+    <!-- Allow outgoing network connections (backend HTTP) -->
+    <key>com.apple.security.network.client</key>
+    <true/>
+    <!-- Allow incoming network connections (backend server) -->
+    <key>com.apple.security.network.server</key>
+    <true/>
+    <!-- Allow child process spawning (Python sidecar) -->
+    <key>com.apple.security.cs.allow-jit</key>
+    <false/>
+    <key>com.apple.security.cs.allow-unsigned-executable-memory</key>
+    <true/>
+    <key>com.apple.security.cs.disable-library-validation</key>
+    <true/>
+    <!-- App sandbox must be OFF for virtual camera DAL plugin to work -->
+    <key>com.apple.security.app-sandbox</key>
+    <false/>
+</dict>
+</plist>

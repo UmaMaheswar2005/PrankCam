@@ -1,0 +1,272 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+"   # triggers on v3.0.0, v3.1.0, etc.
+  workflow_dispatch:               # also allows manual trigger from GitHub UI
+
+# Cancel in-progress runs for same ref
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # Exact Python version for reproducible PyInstaller builds
+  PYTHON_VERSION: "3.11.9"
+  # Exact Node version matching package.json engines
+  NODE_VERSION:   "22.13.1"
+  # Rust channel
+  RUST_CHANNEL: "stable"
+
+jobs:
+  # ── macOS — builds BOTH Apple Silicon and Intel ─────────────────────────────
+  build-macos:
+    name: macOS (${{ matrix.arch }})
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch:   arm64
+            runner: macos-14          # Apple Silicon (M1) runner
+            triple: aarch64-apple-darwin
+          - arch:   x64
+            runner: macos-13          # Intel runner
+            triple: x86_64-apple-darwin
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Set up Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Set up Rust ${{ env.RUST_CHANNEL }}
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: ${{ env.RUST_CHANNEL }}
+
+      - name: Cache Rust build
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+
+      - name: Install Python dependencies
+        run: |
+          cd backend
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install -r requirements-build.txt
+
+      - name: Build PyInstaller sidecar
+        run: bash scripts/build-backend.sh
+
+      - name: Install Node dependencies
+        run: npm ci
+
+      # Download driver binaries from GitHub release assets or secrets
+      - name: Download macOS drivers
+        env:
+          BLACKHOLE_URL: ${{ secrets.BLACKHOLE_PKG_URL }}
+        run: |
+          mkdir -p src-tauri/drivers/macos
+          if [ -n "$BLACKHOLE_URL" ]; then
+            curl -fsSL "$BLACKHOLE_URL" -o src-tauri/drivers/macos/BlackHole2ch.pkg
+            echo "BlackHole downloaded"
+          else
+            echo "BLACKHOLE_PKG_URL secret not set — driver will not be bundled"
+          fi
+
+      - name: Build Tauri app (macOS)
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN:           ${{ secrets.GITHUB_TOKEN }}
+          APPLE_CERTIFICATE:      ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          APPLE_ID:               ${{ secrets.APPLE_ID }}
+          APPLE_PASSWORD:         ${{ secrets.APPLE_PASSWORD }}
+          APPLE_TEAM_ID:          ${{ secrets.APPLE_TEAM_ID }}
+        with:
+          tagName:        ${{ github.ref_name }}
+          releaseName:    "PrankCam ${{ github.ref_name }}"
+          releaseBody:    "See CHANGELOG.md for details."
+          releaseDraft:   true
+          prerelease:     false
+          args:           --target ${{ matrix.triple }}
+
+  # ── Windows ─────────────────────────────────────────────────────────────────
+  build-windows:
+    name: Windows x64
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Set up Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Set up Rust ${{ env.RUST_CHANNEL }}
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: ${{ env.RUST_CHANNEL }}
+
+      - name: Cache Rust build
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+
+      - name: Install Python dependencies
+        run: |
+          cd backend
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install -r requirements-build.txt
+
+      - name: Build PyInstaller sidecar
+        shell: pwsh
+        run: powershell -ExecutionPolicy Bypass -File scripts\build-backend.ps1
+
+      - name: Install Node dependencies
+        run: npm ci
+
+      - name: Download Windows drivers
+        env:
+          OBS_VCAM_URL:    ${{ secrets.OBS_VCAM_WINDOWS_URL }}
+          VBCABLE_URL:     ${{ secrets.VBCABLE_URL }}
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path src-tauri\drivers\windows | Out-Null
+          if ($env:OBS_VCAM_URL) {
+            Invoke-WebRequest $env:OBS_VCAM_URL -OutFile src-tauri\drivers\windows\obs-virtualcam-setup.exe
+            Write-Host "OBS vcam downloaded"
+          } else { Write-Host "OBS_VCAM_WINDOWS_URL not set — driver not bundled" }
+          if ($env:VBCABLE_URL) {
+            Invoke-WebRequest $env:VBCABLE_URL -OutFile src-tauri\drivers\windows\VBCABLE_Setup_x64.exe
+            Write-Host "VB-Cable downloaded"
+          } else { Write-Host "VBCABLE_URL not set — driver not bundled" }
+
+      - name: Build Tauri app (Windows)
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN:                 ${{ secrets.GITHUB_TOKEN }}
+          TAURI_SIGNING_PRIVATE_KEY:    ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        with:
+          tagName:      ${{ github.ref_name }}
+          releaseName:  "PrankCam ${{ github.ref_name }}"
+          releaseBody:  "See CHANGELOG.md for details."
+          releaseDraft: true
+          prerelease:   false
+
+  # ── Linux ────────────────────────────────────────────────────────────────────
+  build-linux:
+    name: Linux x64
+    runs-on: ubuntu-22.04
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Set up Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Set up Rust ${{ env.RUST_CHANNEL }}
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: ${{ env.RUST_CHANNEL }}
+
+      - name: Cache Rust build
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+
+      - name: Install Tauri Linux system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev \
+            libayatana-appindicator3-dev \
+            librsvg2-dev \
+            libssl-dev \
+            patchelf \
+            libsoup-3.0-dev \
+            libjavascriptcoregtk-4.1-dev
+
+      - name: Install Python dependencies
+        run: |
+          cd backend
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install -r requirements-build.txt
+
+      - name: Build PyInstaller sidecar
+        run: bash scripts/build-backend.sh
+
+      - name: Install Node dependencies
+        run: npm ci
+
+      - name: Build Tauri app (Linux)
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tagName:      ${{ github.ref_name }}
+          releaseName:  "PrankCam ${{ github.ref_name }}"
+          releaseBody:  "See CHANGELOG.md for details."
+          releaseDraft: true
+          prerelease:   false
+
+  # ── Publish release once all platform builds succeed ─────────────────────────
+  publish-release:
+    name: Publish GitHub Release
+    needs: [build-macos, build-windows, build-linux]
+    runs-on: ubuntu-22.04
+    if: ${{ !failure() && !cancelled() }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Publish draft release
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: releases } = await github.rest.repos.listReleases({
+              owner: context.repo.owner,
+              repo:  context.repo.repo,
+            });
+            const draft = releases.find(r => r.draft && r.tag_name === context.ref.replace('refs/tags/', ''));
+            if (draft) {
+              await github.rest.repos.updateRelease({
+                owner:      context.repo.owner,
+                repo:       context.repo.repo,
+                release_id: draft.id,
+                draft:      false,
+              });
+              console.log(`Published release: ${draft.html_url}`);
+            } else {
+              console.log('No draft release found for this tag.');
+            }

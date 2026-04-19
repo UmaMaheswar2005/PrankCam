@@ -1,0 +1,30 @@
+# PrankCam .gitignore
+
+# Python
+backend/.venv/
+backend/__pycache__/
+backend/*.pyc
+backend/weights/          # model weights can be hundreds of MB — never commit
+*.egg-info/
+.pytest_cache/
+
+# Node / Next.js
+node_modules/
+.next/
+out/
+.env.local
+
+# Rust / Tauri
+src-tauri/target/
+
+# OS
+.DS_Store
+Thumbs.db
+*.swp
+
+# IDE
+.vscode/settings.json
+.idea/
+
+# PrankCam runtime data (generated per-user)
+# ~/.prankcam/ lives outside the repo — nothing to ignore here
