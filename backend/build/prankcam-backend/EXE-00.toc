@@ -56,7 +56,7 @@
  [],
  False,
  False,
- 1776589910,
+ 1776591480,
  [('runw',
    '/Users/umamaheswarreddy/Downloads/prankcam/backend/.venv/lib/python3.11/site-packages/PyInstaller/bootloader/Darwin-64bit/runw',
    'EXECUTABLE')],
